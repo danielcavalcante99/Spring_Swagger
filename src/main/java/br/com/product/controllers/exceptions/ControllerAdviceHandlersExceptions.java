@@ -10,11 +10,16 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import br.com.product.services.exceptions.ProductBadRequestException;
 import br.com.product.services.exceptions.ProductNotFoundException;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
 
 @RestControllerAdvice
 public class ControllerAdviceHandlersExceptions {
 	
 	@ExceptionHandler(ProductNotFoundException.class)
+	@ApiResponse(responseCode = "404", description = "Produto não encontrado",
+	content = @Content(schema = @Schema(implementation =  StandardError.class)))
 	public ResponseEntity<StandardError> resourceNotFound(ProductNotFoundException e, HttpServletRequest request) {
 		
 		StandardError standardError = new StandardError();
@@ -27,6 +32,8 @@ public class ControllerAdviceHandlersExceptions {
 	
 	
 	@ExceptionHandler(ProductBadRequestException.class)
+	@ApiResponse(responseCode = "400", description = "Requisição inválida",
+	content = @Content(schema = @Schema(implementation =  StandardError.class)))
 	public ResponseEntity<StandardError> resourceBadRequest(ProductBadRequestException e, HttpServletRequest request) {
 		
 		StandardError standardError = new StandardError();
@@ -39,6 +46,8 @@ public class ControllerAdviceHandlersExceptions {
 	
 	
 	@ExceptionHandler(MethodArgumentNotValidException.class)
+	@ApiResponse(responseCode = "400", description = "Requisição inválida",
+	content = @Content(schema = @Schema(implementation =  StandardError.class)))
 	public ResponseEntity<StandardError> resourceBadRequest(MethodArgumentNotValidException e, HttpServletRequest request) {
 
 		StandardError standardError = new StandardError();
