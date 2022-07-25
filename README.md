@@ -40,6 +40,10 @@ link: https://swagger.io/tools/open-source/
 - Clone o projeto em sua máquina local para facilitar seu entendimento:</br>
 git clone https://github.com/danielcavalcante99/Spring_Swagger.git
 
+
+Logo abaixo irei demostrar pequenos trechos para explicar como construir o OpenAPI em código Java, lembrando que o contéudo abaixo já está implementado nesse projeto.
+
+
 - Dependência do <b>springdoc-openapi</b> no arquivo pom.xml:
 ~~~
    <dependency>
@@ -48,27 +52,13 @@ git clone https://github.com/danielcavalcante99/Spring_Swagger.git
       <version>1.6.9</version>
    </dependency>
 ~~~
-##
+
 
 <b>Package:</b> br.com.product.config;</br>
 <b>Classe:</b> SwaggerConfig;
 
-A classe SwaggerConfig é aquela que configura o bean do objeto OpenAPI.
+A classe SwaggerConfig: configuração do bean do objeto OpenAPI.
 ~~~
-package br.com.product.config;
-
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-
-import io.swagger.v3.oas.models.Components;
-import io.swagger.v3.oas.models.OpenAPI;
-import io.swagger.v3.oas.models.info.Contact;
-import io.swagger.v3.oas.models.info.Info;
-import io.swagger.v3.oas.models.security.SecurityScheme;
-
-@Configuration
-public class SwaggerConfig {
-	
   @Bean
   public OpenAPI OpenAPI() {
     	
@@ -86,39 +76,13 @@ public class SwaggerConfig {
                 
 }
 ~~~
-##
+
 
 <b>Package:</b> package br.com.product.controllers;</br>
 <b>Classe:</b> ProductController;
 
-A classe ProductController é onde está definido o nome da tag, operações que fazem parte dela e o corpo da resposta.
+Classe ProductController: nesse trecho do código é onde está configurado o nome da tag, as operações que fazem parte dela, definição do conteúdo e do status http de resposta. 
 ~~~
-package br.com.product.controllers;
-
-import java.util.List;
-
-import javax.validation.Valid;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-
-import br.com.product.entities.Product;
-import br.com.product.services.ProductService;
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.media.Content;
-import io.swagger.v3.oas.annotations.media.Schema;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.security.SecurityRequirement;
-import io.swagger.v3.oas.annotations.tags.Tag;
 
 @Tag(name = "Produtos")
 @RestController
@@ -136,69 +100,16 @@ public class ProductController {
 	public ResponseEntity<List<Product>> findAllProducts() {
 		List<Product> productList = this.service.findAll();
 		return ResponseEntity.ok(productList);
-	}
-
-	@GetMapping("/{id}")
-	@Operation(summary = "Consultar produto pelo ID")
-	@ApiResponse(responseCode = "200", description = "Busca realizada com sucesso",
-	content = @Content(schema = @Schema(implementation = Product.class)))
-	public ResponseEntity<Product> findProduct(@PathVariable Integer id) {
-		Product product = this.service.findById(id);
-		return ResponseEntity.ok(product);
-	}
-
-	@PutMapping("/update")
-	@Operation(summary = "Atualizar dados do produto")
-	@ApiResponse(responseCode = "201", description = "Dados do produto atualizado com sucesso",
-	content = @Content(schema = @Schema(implementation = Product.class)))
-	public ResponseEntity<Product> updateProduct(@RequestBody @Valid Product requestProduct) {
-		Product product = this.service.update(requestProduct);
-		return ResponseEntity.status(HttpStatus.CREATED).body(product);
-	}
-
-	@DeleteMapping("/delete/{id}")
-	@Operation(summary = "Exclusão do produto pelo ID")
-	@ApiResponse(responseCode = "201", description = "Produto excluído com sucesso",
-	content = @Content(schema = @Schema(implementation = Product.class)))
-	public ResponseEntity<Product> deleteProduct(@PathVariable Integer id) {
-		Product product = this.service.deleteById(id);
-		return ResponseEntity.status(HttpStatus.CREATED).body(product);
-	}
-
-	@PostMapping("/insert")
-	@Operation(summary = "Cadastro de produto")
-	@ApiResponse(responseCode = "201", description = "Produto cadastrado com sucesso",
-	content = @Content(schema = @Schema(implementation = Product.class)))
-	public ResponseEntity<Product> insertProduct(@RequestBody @Valid Product requestProduct) {
-		Product product = this.service.insert(requestProduct);
-		return ResponseEntity.status(HttpStatus.CREATED).body(product);
-	}
 
 }
 ~~~
-##
+
 
 <b>Package:</b> br.com.product.controllers.exceptions;</br>
 <b>Classe:</b> ControllerAdviceHandlersExceptions;
 
-A classe ControllerAdviceHandlersExceptions é onde foi definido o status http, descrição e corpo da resposta quando a requisição não é bem sucedida.
+Classe ControllerAdviceHandlersExceptions: nesse trecho do código é onde está configurado o conteúdo e o status http de resposta das requisições que não foram bem sucedidas. 
 ~~~
-package br.com.product.controllers.exceptions;
-
-import javax.servlet.http.HttpServletRequest;
-
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.MethodArgumentNotValidException;
-import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.bind.annotation.RestControllerAdvice;
-
-import br.com.product.services.exceptions.ProductBadRequestException;
-import br.com.product.services.exceptions.ProductNotFoundException;
-import io.swagger.v3.oas.annotations.media.Content;
-import io.swagger.v3.oas.annotations.media.Schema;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
-
 @RestControllerAdvice
 public class ControllerAdviceHandlersExceptions {
 	
@@ -214,37 +125,26 @@ public class ControllerAdviceHandlersExceptions {
 		
 		return ResponseEntity.status(HttpStatus.NOT_FOUND).body(standardError);
 	}
-	
-	
-	@ExceptionHandler(ProductBadRequestException.class)
-	@ApiResponse(responseCode = "400", description = "Requisição inválida",
-	content = @Content(schema = @Schema(implementation =  StandardError.class)))
-	public ResponseEntity<StandardError> resourceBadRequest(ProductBadRequestException e, HttpServletRequest request) {
-		
-		StandardError standardError = new StandardError();
-		standardError.setTitleError("Bad Request");
-		standardError.setStatusHttp(HttpStatus.BAD_REQUEST.value());
-		standardError.setMessage(e.getMessage());
-		
-		return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(standardError);
-	}
-	
-	
-	@ExceptionHandler(MethodArgumentNotValidException.class)
-	@ApiResponse(responseCode = "400", description = "Requisição inválida",
-	content = @Content(schema = @Schema(implementation =  StandardError.class)))
-	public ResponseEntity<StandardError> resourceBadRequest(MethodArgumentNotValidException e, HttpServletRequest request) {
 
-		StandardError standardError = new StandardError();
-		standardError.setTitleError("Bad Request");
-		standardError.setStatusHttp(HttpStatus.BAD_REQUEST.value());
-		standardError.setMessage(e.getFieldError().getField().concat(" ").concat(e.getFieldError().getDefaultMessage()));
-		
-		return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(standardError);
-	}
 }
 ~~~
-  
+
+
 - @Tag: para especificar o nome da tag.
 - @Operation: para especificar o tipo de operação.
-- @ApiResponse: para especificar o status http, response body e a descrição.  
+- @ApiResponse: para definir o código do status http, a descrição e conteúdo de retorno da requisição.  
+
+##
+
+### Como executar o projeto ?
+
+Primeiramente você precisa ter o Java instalado na sua máquina. </br>Após clonar o projeto na sua máquina local, abra em alguma IDE de sua preferência, irei mostrar um exemplo de como executar esse projeto utilizando o Spring Tool Suite (STS):
+
+![image](https://user-images.githubusercontent.com/74054701/180882314-c520b55c-6514-4a50-97b4-caba1300e814.png)
+
+Com a aplicação rodando localmente você já pode visualizar o OpenAPI, basta digitar o seguinte endereço no navegador:
+~~~
+http://localhost:8080/swagger-ui/index.html
+~~~
+
+
